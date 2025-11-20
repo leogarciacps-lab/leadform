@@ -44,7 +44,7 @@ app.post('/submit-form', async (req, res) => {
         },
         leads: [
             {
-                properties: { reference: "", noSell: true },
+                properties: { reference: "", noSell: false },
                 fields: {
                     FirstName: firstName || "",
                     LastName: lastName || "",
