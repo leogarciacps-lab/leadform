@@ -36,15 +36,15 @@ app.post('/submit-form', async (req, res) => {
 
     const payload = {
         source: {
-            vid: 70193,
-            aid: 30518,
-            lid: 6632,
+            vid: 99804,
+            aid: 43,
+            lid: 12,
             sendDelay: 0,
             returnUrl: ""
         },
         leads: [
             {
-                properties: { reference: "", noSell: false },
+                properties: { reference: "", noSell: True },
                 fields: {
                     FirstName: firstName || "",
                     LastName: lastName || "",
@@ -66,7 +66,7 @@ app.post('/submit-form', async (req, res) => {
 
     try {
         const response = await axios.post(
-            'https://leads.leadexec.net/processor/insert/general/',
+            'https://leads-dev.leadexec.net/processor/insert/general',
             payload,
             {
                 headers: {
