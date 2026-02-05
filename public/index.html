@@ -10,25 +10,35 @@
 
 <style>
 body {
-    background-color: #e6f0ff;
+    background-color: #f4f4f4;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 40px;
 }
 
 .container {
-    max-width: 550px;
-    background: linear-gradient(145deg, #ffffff, #dce6f9);
+    max-width: 560px;
+    background: #ffffff;
     padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     margin: auto;
+    border-top: 6px solid #f96302;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header svg {
+    width: 60px;
+    margin-bottom: 10px;
 }
 
 h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: 600;
-    color: #003366;
+    font-weight: 700;
+    color: #333333;
+    margin: 0;
 }
 
 input[type="text"],
@@ -36,45 +46,52 @@ input[type="email"] {
     width: 100%;
     padding: 12px 14px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
 }
 
 input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 6px rgba(0,123,255,0.4);
+    border-color: #f96302;
+    box-shadow: 0 0 5px rgba(249,99,2,0.4);
     outline: none;
 }
 
 #consentText {
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     padding: 12px;
     min-height: 60px;
-    background-color: #f1f4fc;
+    background-color: #fafafa;
     margin-bottom: 10px;
+    font-size: 13px;
 }
 
 #statusMsg {
-    color: #6c757d;
+    color: #666;
     font-style: italic;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 .btn-submit {
     width: 100%;
-    background: #007bff;
+    background: #f96302;
     border: none;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 13px;
+    border-radius: 6px;
     font-size: 16px;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-submit:hover:not(.disabled) {
+    background: #e45700;
 }
 
 .btn-submit.disabled {
-    background: #9cb4d8;
+    background: #f2b48a;
     cursor: not-allowed;
 }
 </style>
@@ -83,7 +100,17 @@ input:focus {
 <body>
 
 <div class="container">
-<h2>Lead Form</h2>
+
+    <div class="header">
+        <!-- Home Depot–style icon -->
+        <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" fill="#f96302"/>
+            <text x="50%" y="62%" text-anchor="middle"
+                  fill="#ffffff" font-size="42" font-weight="900"
+                  font-family="Arial, Helvetica, sans-serif">HD</text>
+        </svg>
+        <h2>Get Your Free Estimate</h2>
+    </div>
 
 <form id="leadForm">
     <input type="hidden" id="consentTextIPAddress" name="IPAddress" />
@@ -95,15 +122,15 @@ input:focus {
 
     <input type="text" name="firstName" placeholder="First Name" required />
     <input type="text" name="lastName" placeholder="Last Name" required />
-    <input type="email" name="email" placeholder="Email" required />
+    <input type="email" name="email" placeholder="Email Address" required />
     <input type="text" name="phone" placeholder="Phone Number" />
-    <input type="text" name="zip" placeholder="Zip Code" />
+    <input type="text" name="zip" placeholder="ZIP Code" />
 
     <div id="consentText">Loading TCPA consent text...</div>
     <p id="statusMsg">Please wait, verifying consent...</p>
 
     <button type="submit" class="btn-submit disabled" id="submitBtn" aria-disabled="true">
-        Submit
+        Submit Request
     </button>
 </form>
 </div>
@@ -128,7 +155,7 @@ const consentTextIPElementName = 'consentTextIPAddress';
     consentS.parentNode.insertBefore(consentJs, consentS);
 })();
 
-/* Poll for consent + IP (DEV compliant) */
+/* Poll for consent + IP */
 let attempts = 0;
 const maxAttempts = 20;
 
@@ -167,19 +194,9 @@ const checkConsent = setInterval(() => {
 /* AJAX submit */
 $('#leadForm').on('submit', function (e) {
     e.preventDefault();
-
     if ($('#submitBtn').hasClass('disabled')) return;
 
-    const ip = $('#consentTextIPAddress').val();
-    const consentText = $('#consentText').text();
-    const consentGiven = $('#ConsentGiven').val();
-
-    if (!ip || !consentText || consentGiven !== "Yes") {
-        alert('Consent not fully verified. Please wait.');
-        return;
-    }
-
-    $('input[name="consentText"]').val(consentText);
+    $('input[name="consentText"]').val($('#consentText').text());
     $('input[name="UserAgent"]').val(navigator.userAgent);
 
     $.ajax({
@@ -190,9 +207,8 @@ $('#leadForm').on('submit', function (e) {
             alert(res);
             location.reload();
         },
-        error: function (err) {
+        error: function () {
             alert('Error submitting lead.');
-            console.error(err);
         }
     });
 });
