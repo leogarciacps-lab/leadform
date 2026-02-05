@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Lead Form</title>
+
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
 <style>
 body {
     background-color: #e6f0ff;
@@ -36,7 +38,6 @@ input[type="email"] {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    transition: all 0.3s ease;
 }
 
 input:focus {
@@ -51,7 +52,6 @@ input:focus {
     padding: 12px;
     min-height: 60px;
     background-color: #f1f4fc;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
     margin-bottom: 10px;
 }
 
@@ -71,15 +71,6 @@ input:focus {
     font-size: 16px;
     color: white;
     font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.btn-submit:hover:not(.disabled) {
-    background: #0056b3;
-}
-
-.btn-submit:not(.disabled):active {
-    transform: scale(0.98);
 }
 
 .btn-submit.disabled {
@@ -88,33 +79,37 @@ input:focus {
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
 <h2>Lead Form</h2>
 
 <form id="leadForm">
-    <input type="hidden" name="IPAddress" id="consentTextIPAddress" />
+    <input type="hidden" id="consentTextIPAddress" name="IPAddress" />
     <input type="hidden" name="consentText" value="" />
-    <input type="hidden" name="ConsentGiven" id="ConsentGiven" value="No">
-    <input type="hidden" name="MobilePhone" value="">
-    <input type="hidden" name="IsMobile" value="">
-    <input type="hidden" name="UserAgent" value="">
-    <input type="text" name="firstName" placeholder="First Name" required>
-    <input type="text" name="lastName" placeholder="Last Name" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="text" name="phone" placeholder="Phone Number">
-    <input type="text" name="zip" placeholder="Zip Code">
+    <input type="hidden" id="ConsentGiven" name="ConsentGiven" value="No" />
+    <input type="hidden" name="MobilePhone" />
+    <input type="hidden" name="IsMobile" />
+    <input type="hidden" name="UserAgent" />
+
+    <input type="text" name="firstName" placeholder="First Name" required />
+    <input type="text" name="lastName" placeholder="Last Name" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="text" name="phone" placeholder="Phone Number" />
+    <input type="text" name="zip" placeholder="Zip Code" />
 
     <div id="consentText">Loading TCPA consent text...</div>
     <p id="statusMsg">Please wait, verifying consent...</p>
 
-    <button class="btn-submit disabled" id="submitBtn" aria-disabled="true">Submit</button>
+    <button type="submit" class="btn-submit disabled" id="submitBtn" aria-disabled="true">
+        Submit
+    </button>
 </form>
 </div>
 
 <script type="text/javascript">
-// LeadExec consent script
+/* LeadExec DEV consent config */
 const consentKey = '451ed5df-9b50-4512-acd4-c21daea3471d';
 const consentTextAppendMode = 'replace';
 const consentTextLoadOnPageLoad = true;
@@ -122,57 +117,81 @@ const consentTextElementName = 'consentText';
 const consentTextIPElementName = 'consentTextIPAddress';
 
 (function () {
-    const consentJs = document.createElement('script'); 
-    consentJs.type = 'text/javascript'; 
+    const consentJs = document.createElement('script');
+    consentJs.type = 'text/javascript';
     consentJs.async = true;
-    consentJs.src = 'https://consentprovider-dev.leadexec.net/scripts/requestJS.min.js';
-    const consentS = document.getElementsByTagName('script')[0]; 
+    consentJs.src =
+        ('https:' === document.location.protocol ? 'https://' : 'http://') +
+        'consentprovider-dev.leadexec.net/scripts/requestJS.min.js';
+
+    const consentS = document.getElementsByTagName('script')[0];
     consentS.parentNode.insertBefore(consentJs, consentS);
 })();
 
-// Poll for consent
+/* Poll for consent + IP (DEV compliant) */
+let attempts = 0;
+const maxAttempts = 20;
+
 const checkConsent = setInterval(() => {
+    attempts++;
+
     const ipField = document.getElementById('consentTextIPAddress');
     const consentContainer = document.getElementById('consentText');
 
-    if (ipField?.value && consentContainer?.innerText.trim().length > 50 && 
-        !consentContainer.innerText.includes('Loading')) {
+    const consentReady =
+        consentContainer &&
+        consentContainer.innerText.trim().length > 20 &&
+        !consentContainer.innerText.includes('Loading');
+
+    const ipReady =
+        ipField &&
+        ipField.value &&
+        ipField.value.trim() !== "";
+
+    if (consentReady && ipReady) {
         document.getElementById('ConsentGiven').value = "Yes";
         document.getElementById('submitBtn').classList.remove('disabled');
         document.getElementById('submitBtn').removeAttribute('aria-disabled');
-        document.getElementById('statusMsg').innerText = "Consent verified. You can now submit.";
+        document.getElementById('statusMsg').innerText =
+            "Consent verified. You can now submit.";
+        clearInterval(checkConsent);
+    }
+
+    if (attempts >= maxAttempts) {
+        document.getElementById('statusMsg').innerText =
+            "Unable to verify consent. Please refresh the page.";
         clearInterval(checkConsent);
     }
 }, 500);
 
-// AJAX submit
-$('#submitBtn').click(function(e) {
+/* AJAX submit */
+$('#leadForm').on('submit', function (e) {
     e.preventDefault();
-    if ($(this).hasClass('disabled')) return;
 
-    const ipField = $('#consentTextIPAddress').val();
-    const consentContainer = $('#consentText').text();
+    if ($('#submitBtn').hasClass('disabled')) return;
+
+    const ip = $('#consentTextIPAddress').val();
+    const consentText = $('#consentText').text();
     const consentGiven = $('#ConsentGiven').val();
 
-    if (!ipField || consentContainer.trim() === "" || consentGiven !== "Yes") {
-        alert('Waiting for TCPA consent to load. Please try again in a moment.');
+    if (!ip || !consentText || consentGiven !== "Yes") {
+        alert('Consent not fully verified. Please wait.');
         return;
     }
 
-    $('input[name="consentText"]').val(consentContainer);
+    $('input[name="consentText"]').val(consentText);
     $('input[name="UserAgent"]').val(navigator.userAgent);
 
     $.ajax({
         url: '/submit-form',
         type: 'POST',
         data: $('#leadForm').serialize(),
-        success: function(res) {
+        success: function (res) {
             alert(res);
-            // Auto-refresh page after submission
             location.reload();
         },
-        error: function(err) {
-            alert('Error submitting lead. See console for details.');
+        error: function (err) {
+            alert('Error submitting lead.');
             console.error(err);
         }
     });
