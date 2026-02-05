@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lead Form</title>
+<title>Get Your Free Estimate</title>
 
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -10,19 +10,18 @@
 
 <style>
 body {
-    background-color: #f4f4f4;
+    background-color: #f5f5f5;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 40px;
 }
 
 .container {
-    max-width: 560px;
+    max-width: 550px;
     background: #ffffff;
     padding: 30px 40px;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     margin: auto;
-    border-top: 6px solid #f96302;
 }
 
 .header {
@@ -30,15 +29,15 @@ body {
     margin-bottom: 25px;
 }
 
-.header svg {
-    width: 60px;
+.header img {
+    width: 100px;
     margin-bottom: 10px;
 }
 
-h2 {
+.header h2 {
     font-weight: 700;
-    color: #333333;
-    margin: 0;
+    color: #f96302;
+    margin-top: 0;
 }
 
 input[type="text"],
@@ -46,19 +45,20 @@ input[type="email"] {
     width: 100%;
     padding: 12px 14px;
     margin-bottom: 15px;
-    border: 1px solid #cfcfcf;
-    border-radius: 6px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    transition: all 0.25s ease;
 }
 
 input:focus {
     border-color: #f96302;
-    box-shadow: 0 0 5px rgba(249,99,2,0.4);
+    box-shadow: 0 0 6px rgba(249,99,2,0.4);
     outline: none;
 }
 
 #consentText {
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 12px;
     min-height: 60px;
     background-color: #fafafa;
@@ -67,31 +67,30 @@ input:focus {
 }
 
 #statusMsg {
-    color: #666;
+    color: #6c757d;
     font-style: italic;
     text-align: center;
-    margin-top: 8px;
+    margin-top: 10px;
 }
 
 .btn-submit {
     width: 100%;
     background: #f96302;
     border: none;
-    padding: 13px;
-    border-radius: 6px;
+    padding: 14px;
+    border-radius: 8px;
     font-size: 16px;
-    color: white;
+    color: #ffffff;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
 }
 
 .btn-submit:hover:not(.disabled) {
-    background: #e45700;
+    background: #e25700;
 }
 
 .btn-submit.disabled {
-    background: #f2b48a;
+    background: #f3b48a;
     cursor: not-allowed;
 }
 </style>
@@ -102,37 +101,36 @@ input:focus {
 <div class="container">
 
     <div class="header">
-        <!-- Home Depot–style icon -->
-        <svg viewBox="0 0 100 100">
-            <rect width="100" height="100" fill="#f96302"/>
-            <text x="50%" y="62%" text-anchor="middle"
-                  fill="#ffffff" font-size="42" font-weight="900"
-                  font-family="Arial, Helvetica, sans-serif">HD</text>
-        </svg>
+        <img src="/mnt/data/homedepot logo.png" alt="The Home Depot Logo">
         <h2>Get Your Free Estimate</h2>
     </div>
 
-<form id="leadForm">
-    <input type="hidden" id="consentTextIPAddress" name="IPAddress" />
-    <input type="hidden" name="consentText" value="" />
-    <input type="hidden" id="ConsentGiven" name="ConsentGiven" value="No" />
-    <input type="hidden" name="MobilePhone" />
-    <input type="hidden" name="IsMobile" />
-    <input type="hidden" name="UserAgent" />
+    <form id="leadForm">
 
-    <input type="text" name="firstName" placeholder="First Name" required />
-    <input type="text" name="lastName" placeholder="Last Name" required />
-    <input type="email" name="email" placeholder="Email Address" required />
-    <input type="text" name="phone" placeholder="Phone Number" />
-    <input type="text" name="zip" placeholder="ZIP Code" />
+        <input type="hidden" id="consentTextIPAddress" name="IPAddress" />
+        <input type="hidden" name="consentText" />
+        <input type="hidden" id="ConsentGiven" name="ConsentGiven" value="No" />
+        <input type="hidden" name="MobilePhone" />
+        <input type="hidden" name="IsMobile" />
+        <input type="hidden" name="UserAgent" />
 
-    <div id="consentText">Loading TCPA consent text...</div>
-    <p id="statusMsg">Please wait, verifying consent...</p>
+        <input type="text" name="firstName" placeholder="First Name" required />
+        <input type="text" name="lastName" placeholder="Last Name" required />
+        <input type="email" name="email" placeholder="Email Address" required />
+        <input type="text" name="phone" placeholder="Phone Number" />
+        <input type="text" name="zip" placeholder="ZIP Code" />
 
-    <button type="submit" class="btn-submit disabled" id="submitBtn" aria-disabled="true">
-        Submit Request
-    </button>
-</form>
+        <div id="consentText">Loading TCPA consent text...</div>
+        <p id="statusMsg">Please wait, verifying consent...</p>
+
+        <button type="submit"
+                class="btn-submit disabled"
+                id="submitBtn"
+                aria-disabled="true">
+            Get My Free Estimate
+        </button>
+
+    </form>
 </div>
 
 <script type="text/javascript">
@@ -194,9 +192,19 @@ const checkConsent = setInterval(() => {
 /* AJAX submit */
 $('#leadForm').on('submit', function (e) {
     e.preventDefault();
+
     if ($('#submitBtn').hasClass('disabled')) return;
 
-    $('input[name="consentText"]').val($('#consentText').text());
+    const ip = $('#consentTextIPAddress').val();
+    const consentText = $('#consentText').text();
+    const consentGiven = $('#ConsentGiven').val();
+
+    if (!ip || !consentText || consentGiven !== "Yes") {
+        alert('Consent not fully verified. Please wait.');
+        return;
+    }
+
+    $('input[name="consentText"]').val(consentText);
     $('input[name="UserAgent"]').val(navigator.userAgent);
 
     $.ajax({
@@ -207,8 +215,9 @@ $('#leadForm').on('submit', function (e) {
             alert(res);
             location.reload();
         },
-        error: function () {
+        error: function (err) {
             alert('Error submitting lead.');
+            console.error(err);
         }
     });
 });
