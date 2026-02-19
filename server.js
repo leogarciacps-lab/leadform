@@ -5,7 +5,6 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -17,22 +16,18 @@ app.post('/submit-form', async (req, res) => {
         email,
         phone,
         zip,
-        MobilePhone,
-        IsMobile,
         IPAddress,
         consentText,
         ConsentGiven,
         country
     } = req.body;
 
-    // Default country to USA
-    const countryValue = country && country.trim() !== '' ? country : 'USA';
+    const countryValue = country && country.trim() ? country : 'USA';
+    const consentOk = ConsentGiven === 'Yes';
 
-    if (!IPAddress || !consentText || ConsentGiven !== "Yes") {
+    if (!IPAddress || !consentText || !consentOk) {
         return res.status(400).send('TCPA consent not captured properly.');
     }
-
-    const userAgent = req.headers['user-agent'] || "";
 
     const payload = {
         source: {
@@ -42,36 +37,32 @@ app.post('/submit-form', async (req, res) => {
             sendDelay: 0,
             returnUrl: ""
         },
-        leads: [
-            {
-                properties: { reference: "", noSell: false },
-                fields: {
-                    FirstName: firstName || "",
-                    LastName: lastName || "",
-                    Email: email || "",
-                    Phone: phone || "",
-                    Zip: zip || "",
-                    MobilePhone: MobilePhone || "",
-                    IsMobile: IsMobile || "",
-                    IPAddress: IPAddress || "",
-                    ConsentText: consentText || "",
-                    ConsentDateTime: new Date().toISOString(),
-                    ConsentGiven: "Yes",
-                    UserAgent: userAgent,
-                    Country: countryValue
-                }
+        leads: [{
+            properties: { reference: "", noSell: false },
+            fields: {
+                FirstName: firstName || "",
+                LastName: lastName || "",
+                Email: email || "",
+                Phone: phone || "",
+                Zip: zip || "",
+                IPAddress,
+                ConsentText: consentText,
+                ConsentDateTime: new Date().toISOString(),
+                ConsentGiven: "Yes",
+                UserAgent: req.headers['user-agent'] || "",
+                Country: countryValue
             }
-        ]
+        }]
     };
 
     try {
-        const response = await axios.post(
+        await axios.post(
             'https://leads.leadexec.net/processor/insert/general',
             payload,
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-key': '[YOUR_API_KEY]' // replace with your real API key
+                    'api-key': '[YOUR_API_KEY]'
                 }
             }
         );
@@ -82,4 +73,6 @@ app.post('/submit-form', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}`)
+);
