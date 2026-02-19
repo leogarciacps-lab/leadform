@@ -2,147 +2,84 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Get Your Free Estimate</title>
-
-<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+<title>Lead Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
-    background-color: #eef3f9;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 40px;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
 }
 
-.container {
-    max-width: 560px;
+form {
+    max-width: 500px;
+    margin: 40px auto;
     background: #ffffff;
-    padding: 32px 40px;
-    border-radius: 12px;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.15);
-    margin: auto;
-    border-top: 6px solid #1f6fd6;
+    padding: 25px;
+    border-radius: 6px;
 }
 
-h2 {
-    text-align: center;
-    font-weight: 700;
-    color: #1f6fd6;
-    margin-bottom: 25px;
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
 }
 
 input[type="text"],
-input[type="email"] {
+input[type="email"],
+input[type="tel"] {
     width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 10px;
+    margin-top: 5px;
 }
 
-input:focus {
-    border-color: #1f6fd6;
-    box-shadow: 0 0 6px rgba(31,111,214,0.4);
-    outline: none;
+.consent-wrapper {
+    margin-top: 20px;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 #consentText {
-    border: 1px solid #d6e2f3;
-    border-radius: 6px;
-    padding: 12px;
-    background-color: #f5f9ff;
-    font-size: 13px;
-    line-height: 1.4;
-    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-#consentLoading {
-    font-size: 13px;
-    color: #666;
-    margin-top: 10px;
-}
-
-.consent-checkbox {
-    margin-top: 12px;
-}
-
-.consent-checkbox label {
+.checkbox-line {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    font-size: 14px;
-    line-height: 1.4;
+}
+
+.checkbox-line input {
+    margin-top: 3px;
+}
+
+.checkbox-line label {
+    font-weight: normal;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: #0a58ca;
+    color: #fff;
+    border: none;
+    font-size: 16px;
     cursor: pointer;
 }
-
-.consent-checkbox input[type="checkbox"] {
-    margin-top: 2px;
-}
-
-.btn-submit {
-    width: 100%;
-    background: #1f6fd6;
-    border: none;
-    padding: 14px;
-    border-radius: 6px;
-    font-size: 16px;
-    color: white;
-    font-weight: 700;
-    margin-top: 18px;
-}
-
-.btn-submit:disabled {
-    background: #9cbbe9;
-    cursor: not-allowed;
-}
 </style>
-</head>
 
-<body>
-
-<div class="container">
-    <h2>Get Your Free Estimate</h2>
-
-<form id="leadForm">
-
-    <!-- Hidden TCPA fields -->
-    <input type="hidden" id="consentTextIPAddress" name="IPAddress">
-    <input type="hidden" id="ConsentGiven" name="ConsentGiven" value="No">
-    <input type="hidden" id="ConsentTextHidden" name="ConsentText">
-    <input type="hidden" name="UserAgent">
-
-    <!-- Lead fields -->
-    <input type="text" name="firstName" placeholder="First Name" required>
-    <input type="text" name="lastName" placeholder="Last Name" required>
-    <input type="email" name="email" placeholder="Email Address" required>
-    <input type="text" name="phone" placeholder="Phone Number">
-    <input type="text" name="zip" placeholder="ZIP Code">
-
-    <!-- Consent -->
-    <p id="consentLoading">Loading consent text…</p>
-    <div id="consentText"></div>
-
-    <div class="consent-checkbox">
-        <label for="consentCheckbox">
-            <input type="checkbox" id="consentCheckbox" required>
-            <span>I have read and agree to the consent language above.</span>
-        </label>
-    </div>
-
-    <button type="submit" class="btn-submit" id="submitBtn" disabled>
-        Submit
-    </button>
-</form>
-</div>
-
-<!-- LeadExec Consent Provider -->
+<!-- LeadExec Consent Provider Configuration -->
 <script type="text/javascript">
-const consentKey = '451ed5df-9b50-4512-acd4-c21daea3471d';
-const consentTextAppendMode = 'replace';
-const consentTextLoadOnPageLoad = true;
-const consentTextElementName = 'consentText';
-const consentTextIPElementName = 'consentTextIPAddress';
+    const consentKey = '8e576c04-0a0e-406a-934a-774961b4a373';
+    const consentTextAppendMode = 'default'; // append | replace | default
+    const consentTextLoadOnPageLoad = true;
+    const consentTextElementName = 'consentText';
+    const consentTextIPElementName = 'consentTextIPAddress';
+</script>
 
+<!-- LeadExec Consent Provider Script -->
+<script type="text/javascript">
 (function () {
     var consentJs = document.createElement('script');
     consentJs.type = 'text/javascript';
@@ -151,50 +88,46 @@ const consentTextIPElementName = 'consentTextIPAddress';
         (document.location.protocol === 'https:' ? 'https://' : 'http://') +
         'consentprovider.leadexec.net/scripts/requestJS.min.js';
 
-    var consentS = document.getElementsByTagName('script')[0];
-    consentS.parentNode.insertBefore(consentJs, consentS);
+    var firstScript = document.getElementsByTagName('script')[0];
+    firstScript.parentNode.insertBefore(consentJs, firstScript);
 })();
 </script>
 
-<script>
-// Hide loading text once consent loads
-const consentWatcher = setInterval(() => {
-    const consentDiv = document.getElementById('consentText');
-    if (consentDiv && consentDiv.innerText.trim().length > 30) {
-        document.getElementById('consentLoading').style.display = 'none';
-        clearInterval(consentWatcher);
-    }
-}, 300);
+</head>
 
-// Enable submit only when checkbox is checked
-document.getElementById('consentCheckbox').addEventListener('change', function () {
-    document.getElementById('submitBtn').disabled = !this.checked;
-});
+<body>
 
-// Submit handler
-$('#leadForm').on('submit', function (e) {
-    e.preventDefault();
+<form method="post" action="/receiver">
 
-    if (!$('#consentCheckbox').is(':checked')) return;
+    <label>First Name</label>
+    <input type="text" name="FirstName" required>
 
-    $('#ConsentGiven').val('Yes');
-    $('#ConsentTextHidden').val($('#consentText').text());
-    $('input[name="UserAgent"]').val(navigator.userAgent);
+    <label>Last Name</label>
+    <input type="text" name="LastName" required>
 
-    $.ajax({
-        url: '/submit-form',
-        type: 'POST',
-        data: $('#leadForm').serialize(),
-        success: function () {
-            alert('Lead submitted successfully!');
-            location.reload();
-        },
-        error: function () {
-            alert('Error submitting lead.');
-        }
-    });
-});
-</script>
+    <label>Email</label>
+    <input type="email" name="Email" required>
+
+    <label>Phone</label>
+    <input type="tel" name="Phone" required>
+
+    <!-- Consent -->
+    <div class="consent-wrapper">
+        <div id="consentText">
+            Loading consent text…
+        </div>
+
+        <div class="checkbox-line">
+            <input type="checkbox" id="consentCheckbox" required>
+            <label for="consentCheckbox">
+                I agree to the terms above and consent to be contacted.
+            </label>
+        </div>
+    </div>
+
+    <button type="submit">Submit</button>
+
+</form>
 
 </body>
 </html>
