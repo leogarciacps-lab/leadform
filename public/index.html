@@ -108,7 +108,7 @@ input:focus {
     <!-- Hidden TCPA fields -->
     <input type="hidden" id="consentTextIPAddress" name="IPAddress">
     <input type="hidden" id="ConsentGiven" name="ConsentGiven" value="No">
-    <input type="hidden" name="consentText" id="consentTextHidden">
+    <input type="hidden" id="ConsentTextHidden" name="ConsentText">
     <input type="hidden" name="UserAgent">
 
     <!-- Lead fields -->
@@ -159,8 +159,8 @@ const consentTextIPElementName = 'consentTextIPAddress';
 <script>
 // Hide loading text once consent loads
 const consentWatcher = setInterval(() => {
-    const text = document.getElementById('consentText').innerText.trim();
-    if (text.length > 30) {
+    const consentDiv = document.getElementById('consentText');
+    if (consentDiv && consentDiv.innerText.trim().length > 30) {
         document.getElementById('consentLoading').style.display = 'none';
         clearInterval(consentWatcher);
     }
@@ -178,7 +178,7 @@ $('#leadForm').on('submit', function (e) {
     if (!$('#consentCheckbox').is(':checked')) return;
 
     $('#ConsentGiven').val('Yes');
-    $('#consentTextHidden').val($('#consentText').text());
+    $('#ConsentTextHidden').val($('#consentText').text());
     $('input[name="UserAgent"]').val(navigator.userAgent);
 
     $.ajax({
