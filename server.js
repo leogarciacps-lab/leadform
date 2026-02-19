@@ -36,9 +36,9 @@ app.post('/submit-form', async (req, res) => {
 
     const payload = {
         source: {
-            vid: 99804,
-            aid: 43,
-            lid: 12,
+            vid: 70193,
+            aid: 30518,
+            lid: 6632,
             sendDelay: 0,
             returnUrl: ""
         },
@@ -66,7 +66,7 @@ app.post('/submit-form', async (req, res) => {
 
     try {
         const response = await axios.post(
-            'https://leads-dev.leadexec.net/processor/insert/general',
+            'https://leads.leadexec.net/processor/insert/general',
             payload,
             {
                 headers: {
