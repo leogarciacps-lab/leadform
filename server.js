@@ -57,7 +57,7 @@ app.post('/submit-form', async (req, res) => {
 
     try {
         await axios.post(
-            'https://leads.leadexec.net/processor/insert/general/json/async',
+            'https://leads.leadexec.net/processor/insert/general',
             payload,
             {
                 headers: {
