@@ -260,6 +260,48 @@ function loadConsentProvider() {
     document.head.appendChild(consentJs);
 }
 
+function wait(milliseconds) {
+    return new Promise(function (resolve) {
+        window.setTimeout(resolve, milliseconds);
+    });
+}
+
+async function refreshConsentCapture() {
+    if (
+        typeof leadExecConsentProvider === 'undefined' ||
+        typeof leadExecConsentProvider.reload !== 'function'
+    ) {
+        throw new Error('Consent provider is unavailable');
+    }
+
+    const refreshDeadline = Date.now() + 10000;
+    const capturedIPAddress = document.getElementById('consentTextIPAddress');
+
+    consentText.setAttribute('aria-busy', 'true');
+    capturedIPAddress.value = '';
+    leadExecConsentProvider.reload();
+
+    while (Date.now() < refreshDeadline) {
+        const displayedText = consentText.textContent.trim();
+
+        if (
+            displayedText.length > 30 &&
+            capturedIPAddress.value
+        ) {
+            consentText.setAttribute('aria-busy', 'false');
+
+            // Give the provider time to finish uploading the refreshed page image.
+            await wait(2000);
+            return;
+        }
+
+        await wait(200);
+    }
+
+    consentText.setAttribute('aria-busy', 'false');
+    throw new Error('Consent screenshot refresh timed out');
+}
+
 const consentStartedAt = Date.now();
 const consentWatcher = window.setInterval(function () {
     const displayedText = consentText.textContent.trim();
@@ -297,12 +339,18 @@ form.addEventListener('submit', async function (event) {
     consentTextHidden.value = consentText.textContent.trim();
     userAgent.value = navigator.userAgent;
     submitting = true;
-    submitBtn.textContent = 'Submitting…';
-    formStatus.className = 'status status-loading';
-    formStatus.textContent = 'Submitting your information…';
-    updateSubmitState();
 
     try {
+        // Refresh the LeadExec consent request after the form is completed so
+        // the certificate screenshot includes the entered values and consent.
+        await refreshConsentCapture();
+
+        consentTextHidden.value = consentText.textContent.trim();
+        submitBtn.textContent = 'Submitting…';
+        formStatus.className = 'status status-loading';
+        formStatus.textContent = 'Submitting your information…';
+        updateSubmitState();
+
         const response = await fetch(form.action, {
             method: 'POST',
             headers: {
