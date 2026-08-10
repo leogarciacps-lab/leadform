@@ -269,28 +269,24 @@ function wait(milliseconds) {
 async function refreshConsentCapture() {
     if (
         typeof leadExecConsentProvider === 'undefined' ||
-        typeof leadExecConsentProvider.reload !== 'function' ||
-        typeof leadExecConsentProviderProperties === 'undefined'
+        typeof leadExecConsentProvider.reload !== 'function'
     ) {
         throw new Error('Consent provider is unavailable');
     }
 
-    const previousConsentId = leadExecConsentProviderProperties.crid;
     const refreshDeadline = Date.now() + 10000;
+    const capturedIPAddress = document.getElementById('consentTextIPAddress');
 
     consentText.setAttribute('aria-busy', 'true');
+    capturedIPAddress.value = '';
     leadExecConsentProvider.reload();
 
     while (Date.now() < refreshDeadline) {
-        const currentConsentId = leadExecConsentProviderProperties.crid;
         const displayedText = consentText.textContent.trim();
-        const capturedIPAddress = document.getElementById('consentTextIPAddress').value;
 
         if (
-            currentConsentId &&
-            currentConsentId !== previousConsentId &&
             displayedText.length > 30 &&
-            capturedIPAddress
+            capturedIPAddress.value
         ) {
             consentText.setAttribute('aria-busy', 'false');
 
