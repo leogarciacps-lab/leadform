@@ -255,7 +255,7 @@ function loadConsentProvider() {
     const consentJs = document.createElement('script');
     consentJs.type = 'text/javascript';
     consentJs.async = true;
-    consentJs.src = `${document.location.protocol}//consentprovider.leadexec.net/scripts/requestJS.min.js`;
+    consentJs.src = `${document.location.protocol}//consentprovider-dev.leadexec.net/scripts/requestJS.min.js`;
     consentJs.onerror = showConsentError;
     document.head.appendChild(consentJs);
 }
