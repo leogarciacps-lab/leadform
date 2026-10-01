@@ -218,7 +218,7 @@ input:focus {
 
 <!-- LeadExec Consent Provider -->
 <script type="text/javascript">
-const consentKey = '1b6046d6-fb2d-4403-aab4-b62fd2181cc6';
+const consentKey = '8e576c04-0a0e-406a-934a-774961b4a373';
 const consentTextAppendMode = 'replace';
 const consentTextLoadOnPageLoad = true;
 const consentTextElementName = 'consentText';
@@ -255,7 +255,7 @@ function loadConsentProvider() {
     const consentJs = document.createElement('script');
     consentJs.type = 'text/javascript';
     consentJs.async = true;
-    consentJs.src = `${document.location.protocol}//consentprovider-dev.leadexec.net/scripts/requestJS.min.js`;
+    consentJs.src = `${document.location.protocol}//consentprovider.leadexec.net/scripts/requestJS.min.js`;
     consentJs.onerror = showConsentError;
     document.head.appendChild(consentJs);
 }
